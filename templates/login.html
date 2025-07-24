@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Professional Blog{% endblock %}
+
+{% block content %}
+<div style="max-width: 450px; margin: 2rem auto;">
+    <div class="card fade-in">
+        <div class="card-header text-center">
+            <h2 style="margin: 0; font-size: 1.75rem;">Welcome Back</h2>
+            <p style="margin: 0.5rem 0 0; opacity: 0.9;">Sign in to your account</p>
+        </div>
+        
+        <div class="card-body">
+            <form method="POST" novalidate>
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        👤 Username
+                    </label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-control" 
+                        required 
+                        autocomplete="username"
+                        placeholder="Enter your username"
+                        data-tooltip="Enter the username you registered with"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        🔒 Password
+                    </label>
+                    <div style="position: relative;">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-control" 
+                            required 
+                            autocomplete="current-password" 
+                            placeholder="Enter your password"
+                            data-tooltip="Enter your account password"
+                        >
+                        <button 
+                            type="button" 
+                            class="password-toggle" 
+                            style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary);"
+                            data-tooltip="Show/hide password"
+                        >
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        🚀 Sign In
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card-footer text-center">
+            <p style="margin: 0;">
+                Don't have an account? 
+                <a href="{{ url_for('register') }}" style="font-weight: 600;">
+                    Create one now
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Demo Credentials (Remove in production) -->
+    <div class="card" style="margin-top: 1rem; background: var(--background-color); border: 2px dashed var(--border-color);">
+        <div class="card-body text-center">
+            <h4 style="color: var(--warning-color); margin-bottom: 1rem;">🧪 Demo Mode</h4>
+            <p style="margin-bottom: 1rem; font-size: 0.875rem;">
+                For testing purposes, you can use these demo credentials:
+            </p>
+            <div style="background: white; padding: 1rem; border-radius: var(--border-radius); font-family: monospace; font-size: 0.875rem;">
+                <strong>Username:</strong> demo<br>
+                <strong>Password:</strong> demo123
+            </div>
+            <p style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-secondary);">
+                * Remove this section in production
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle functionality
+    const passwordToggle = document.querySelector('.password-toggle');
+    const passwordInput = document.querySelector('#password');
+    
+    if (passwordToggle && passwordInput) {
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+    }
+    
+    // Auto-fill demo credentials (remove in production)
+    const demoCard = document.querySelector('.card:last-child');
+    if (demoCard) {
+        demoCard.addEventListener('click', function(e) {
+            if (e.target.closest('.card-body')) {
+                document.getElementById('username').value = 'demo';
+                document.getElementById('password').value = 'demo123';
+                showAlert('Demo credentials filled!', 'info');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

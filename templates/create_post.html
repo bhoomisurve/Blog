@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Create New Post{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>✍️ Create New Post</h1>
+    <p>Share your thoughts, ideas, and stories with the community</p>
+</div>
+
+<div class="post-form-container">
+    <form method="POST" class="post-form">
+        <div class="form-group">
+            <label for="title">Post Title *</label>
+            <input type="text" id="title" name="title" required 
+                   placeholder="Enter an engaging title for your post...">
+            <small>A compelling title helps readers discover your content</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="content">Content *</label>
+            <div class="editor-toolbar">
+                <button type="button" class="toolbar-btn" onclick="formatText('bold')">
+                    <strong>B</strong>
+                </button>
+                <button type="button" class="toolbar-btn" onclick="formatText('italic')">
+                    <em>I</em>
+                </button>
+                <button type="button" class="toolbar-btn" onclick="insertText('heading')">
+                    H1
+                </button>
+                <button type="button" class="toolbar-btn" onclick="insertText('list')">
+                    •
+                </button>
+                <button type="button" class="toolbar-btn" onclick="insertText('link')">
+                    🔗
+                </button>
+            </div>
+            <textarea id="content" name="content" rows="15" required 
+                      placeholder="Start writing your post here...
+
+You can use basic HTML tags like:
+- <h2>Headings</h2>
+- <p>Paragraphs</p>
+- <strong>Bold text</strong>
+- <em>Italic text</em>
+- <ul><li>Lists</li></ul>
+- <a href='#'>Links</a>
+
+Share your story, insights, or ideas with the community!"></textarea>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-lg">
+                🚀 Publish Post
+            </button>
+            <button type="button" class="btn btn-outline" onclick="showPreview()">
+                👀 Preview
+            </button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Preview Modal -->
+<div id="preview-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Post Preview</h3>
+            <button class="modal-close" onclick="hidePreview()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <article class="post-preview">
+                <header class="post-header">
+                    <h1 id="preview-title">Your Post Title</h1>
+                    <div class="post-meta">
+                        <span>👤 {{ session.username }}</span>
+                        <span>📅 Today</span>
+                    </div>
+                </header>
+                <div class="post-content" id="preview-content">
+                    Your post content will appear here...
+                </div>
+            </article>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="hidePreview()">Close Preview</button>
+        </div>
+    </div>
+</div>
+
+<!-- Writing Tips -->
+<div class="writing-tips card">
+    <h3>💡 Writing Tips</h3>
+    <ul>
+        <li><strong>Start strong:</strong> Hook your readers with an engaging opening</li>
+        <li><strong>Be authentic:</strong> Share your unique perspective and voice</li>
+        <li><strong>Use headings:</strong> Break up long content with clear sections</li>
+        <li><strong>Add value:</strong> Provide insights, solutions, or entertainment</li>
+        <li><strong>End with impact:</strong> Leave readers with something to think about</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+.post-form-container {
+    max-width: 800px;
+    margin: 0 auto 3rem;
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.editor-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background: var(--background-secondary);
+    border-radius: var(--border-radius);
+    flex-wrap: wrap;
+}
+
+.toolbar-btn {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.toolbar-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
+
+.writing-tips {
+    max-width: 600px;
+    margin: 3rem auto 0;
+    background: var(--background-secondary);
+}
+
+.writing-tips h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.writing-tips ul {
+    list-style: none;
+    padding: 0;
+}
+
+.writing-tips li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.writing-tips li:last-child {
+    border-bottom: none;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 2% auto;
+    border-radius: var(--border-radius);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    padding: 1rem 2rem;
+    border-top: 1px solid var(--border-color);
+    text-align: right;
+}
+
+.post-preview {
+    max-width: none;
+}
+
+.post-header h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.post-content {
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .editor-toolbar {
+        justify-content: center;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 1% auto;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function formatText(format) {
+    const textarea = document.getElementById('content');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    let replacement = '';
+    switch(format) {
+        case 'bold':
+            replacement = `<strong>${selectedText || 'bold text'}</strong>`;
+            break;
+        case 'italic':
+            replacement = `<em>${selectedText || 'italic text'}</em>`;
+            break;
+    }
+    
+    textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+    textarea.focus();
+}
+
+function insertText(type) {
+    const textarea = document.getElementById('content');
+    const cursorPos = textarea.selectionStart;
+    
+    let textToInsert = '';
+    switch(type) {
+        case 'heading':
+            textToInsert = '\n<h2>Heading</h2>\n';
+            break;
+        case 'list':
+            textToInsert = '\n<ul>\n<li>List item 1</li>\n<li>List item 2</li>\n</ul>\n';
+            break;
+        case 'link':
+            textToInsert = '<a href="https://example.com">Link text</a>';
+            break;
+    }
+    
+    textarea.value = textarea.value.substring(0, cursorPos) + textToInsert + textarea.value.substring(cursorPos);
+    textarea.focus();
+}
+
+function showPreview() {
+    const title = document.getElementById('title').value || 'Your Post Title';
+    const content = document.getElementById('content').value || 'Your post content will appear here...';
+    
+    document.getElementById('preview-title').textContent = title;
+    document.getElementById('preview-content').innerHTML = content;
+    document.getElementById('preview-modal').style.display = 'block';
+}
+
+function hidePreview() {
+    document.getElementById('preview-modal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('preview-modal');
+    if (event.target === modal) {
+        hidePreview();
+    }
+}
+</script>
+{% endblock %}

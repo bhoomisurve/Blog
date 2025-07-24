@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Professional Blog{% endblock %}
+
+{% block content %}
+<div class="hero-section" style="text-align: center; padding: 4rem 0; background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); color: white; border-radius: var(--border-radius); margin-bottom: 3rem;">
+    <h1 style="font-size: 3rem; margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Welcome to BlogCraft</h1>
+    <p style="font-size: 1.25rem; opacity: 0.9; max-width: 600px; margin: 0 auto 2rem;">
+        Discover amazing stories, insights, and ideas from our community of writers. 
+        Share your thoughts and connect with like-minded individuals.
+    </p>
+    {% if not session.user_id %}
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="{{ url_for('register') }}" class="btn btn-outline btn-lg" style="border-color: white; color: white;">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary btn-lg">Sign In</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Featured Posts Section -->
+<section class="posts-section">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h2>Latest Posts</h2>
+        {% if session.user_id %}
+            <a href="{{ url_for('create_post') }}" class="btn btn-primary">
+                ✍️ Write a Post
+            </a>
+        {% endif %}
+    </div>
+
+    {% if posts.items %}
+        <div class="posts-grid">
+            {% for post in posts.items %}
+                <article class="card post-item slide-up">
+                    <div class="card-body">
+                        <div class="post-meta">
+                            <div class="post-author">
+                                <span style="font-weight: 600; color: var(--primary-color);">
+                                    👤 {{ post.author.full_name }}
+                                </span>
+                            </div>
+                            <div class="post-date">
+                                <span>📅 {{ post.created_at.strftime('%B %d, %Y') }}</span>
+                            </div>
+                        </div>
+                        
+                        <h3 class="post-title">
+                            <a href="{{ url_for('view_post', slug=post.slug) }}">{{ post.title }}</a>
+                        </h3>
+                        
+                        <div class="post-excerpt">
+                            {{ post.excerpt }}
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                            <a href="{{ url_for('view_post', slug=post.slug) }}" class="btn btn-outline btn-sm">
+                                Read More →
+                            </a>
+                            <div style="display: flex; gap: 1rem; font-size: 0.875rem; color: var(--text-secondary);">
+                                <span>💬 {{ post.comments|length }} comments</span>
+                                <span>👁️ View</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if posts.pages > 1 %}
+            <div class="pagination">
+                {% if posts.has_prev %}
+                    <a href="{{ url_for('index', page=posts.prev_num) }}">&larr; Previous</a>
+                {% endif %}
+                
+                {% for page_num in posts.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num != posts.page %}
+                            <a href="{{ url_for('index', page=page_num) }}">{{ page_num }}</a>
+                        {% else %}
+                            <span class="current">{{ page_num }}</span>
+                        {% endif %}
+                    {% else %}
+                        <span>…</span>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if posts.has_next %}
+                    <a href="{{ url_for('index', page=posts.next_num) }}">Next &rarr;</a>
+                {% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- Empty State -->
+        <div class="card" style="text-align: center; padding: 4rem 2rem;">
+            <div style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;">📝</div>
+            <h3 style="margin-bottom: 1rem; color: var(--text-secondary);">No Posts Yet</h3>
+            <p style="margin-bottom: 2rem; color: var(--text-secondary);">
+                Be the first to share your story with the community!
+            </p>
+            {% if session.user_id %}
+                <a href="{{ url_for('create_post') }}" class="btn btn-primary">
+                    Create Your First Post
+                </a>
+            {% else %}
+                <a href="{{ url_for('register') }}" class="btn btn-primary">
+                    Join the Community
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
+
+<!-- Stats Section -->
+<section style="margin-top: 4rem; padding: 3rem 0; background: var(--card-background); border-radius: var(--border-radius); text-align: center;">
+    <h3 style="margin-bottom: 2rem;">Community Stats</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+        <div class="stat-card">
+            <div class="stat-number">{{ posts.total if posts else 0 }}</div>
+            <div class="stat-label">Total Posts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">
+                {% set comment_count = 0 %}
+                {% if posts and posts.items %}
+                    {% for post in posts.items %}
+                        {% set comment_count = comment_count + post.comments|length %}
+                    {% endfor %}
+                {% endif %}
+                {{ comment_count }}
+            </div>
+            <div class="stat-label">Comments</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">∞</div>
+            <div class="stat-label">Ideas Shared</div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.hero-section {
+    animation: fadeIn 1s ease-out;
+}
+
+.posts-grid {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+    .posts-grid {
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    }
+}
+
+.post-item {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUp 0.6s ease-out forwards;
+}
+
+.post-item:nth-child(1) { animation-delay: 0.1s; }
+.post-item:nth-child(2) { animation-delay: 0.2s; }
+.post-item:nth-child(3) { animation-delay: 0.3s; }
+.post-item:nth-child(4) { animation-delay: 0.4s; }
+.post-item:nth-child(5) { animation-delay: 0.5s; }
+</style>
+{% endblock %}

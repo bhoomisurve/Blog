@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.full_name }} - Profile{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <div class="profile-info">
+        <div class="profile-avatar">
+            <div class="avatar-placeholder">
+                {{ user.full_name[0].upper() }}
+            </div>
+        </div>
+        <div class="profile-details">
+            <h1>{{ user.full_name }}</h1>
+            <p class="username">@{{ user.username }}</p>
+            {% if user.bio %}
+                <p class="bio">{{ user.bio }}</p>
+            {% endif %}
+            <div class="profile-stats">
+                <span>📅 Joined {{ user.created_at.strftime('%B %Y') }}</span>
+                <span>📝 {{ posts|length }} posts</span>
+            </div>
+            {% if session.user_id == user.id %}
+                <a href="{{ url_for('edit_profile') }}" class="btn btn-outline">Edit Profile</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="profile-content">
+    <h2>Posts by {{ user.full_name }}</h2>
+    
+    {% if posts %}
+        <div class="posts-grid">
+            {% for post in posts %}
+                <article class="card post-item">
+                    <div class="card-body">
+                        <div class="post-meta">
+                            <span class="post-date">📅 {{ post.created_at.strftime('%B %d, %Y') }}</span>
+                            {% if post.updated_at > post.created_at %}
+                                <span class="post-updated">✏️ Updated {{ post.updated_at.strftime('%B %d, %Y') }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <h3 class="post-title">
+                            <a href="{{ url_for('view_post', slug=post.slug) }}">{{ post.title }}</a>
+                        </h3>
+                        
+                        <div class="post-excerpt">
+                            {{ post.excerpt }}
+                        </div>
+                        
+                        <div class="post-actions">
+                            <a href="{{ url_for('view_post', slug=post.slug) }}" class="btn btn-outline btn-sm">
+                                Read More →
+                            </a>
+                            <div class="post-stats">
+                                <span>💬 {{ post.comments|length }} comments</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state card">
+            <div style="text-align: center; padding: 3rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.3;">📝</div>
+                <h3 style="margin-bottom: 1rem; color: var(--text-secondary);">No Posts Yet</h3>
+                <p style="color: var(--text-secondary);">
+                    {% if session.user_id == user.id %}
+                        You haven't written any posts yet. Start sharing your thoughts!
+                    {% else %}
+                        {{ user.full_name }} hasn't published any posts yet.
+                    {% endif %}
+                </p>
+                {% if session.user_id == user.id %}
+                    <a href="{{ url_for('create_post') }}" class="btn btn-primary" style="margin-top: 1rem;">
+                        Write Your First Post
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.profile-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 3rem 0;
+    border-radius: var(--border-radius);
+    margin-bottom: 3rem;
+}
+
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.profile-avatar {
+    flex-shrink: 0;
+}
+
+.avatar-placeholder {
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bold;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-details h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.username {
+    font-size: 1.25rem;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
+
+.bio {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+    max-width: 600px;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    opacity: 0.9;
+    flex-wrap: wrap;
+}
+
+.posts-grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.post-stats {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .profile-info {
+        text-align: center;
+        flex-direction: column;
+    }
+    
+    .posts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

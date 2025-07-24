@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - Professional Blog{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 2rem auto;">
+    <div class="card fade-in">
+        <div class="card-header text-center">
+            <h2 style="margin: 0; font-size: 1.75rem;">Join Our Community</h2>
+            <p style="margin: 0.5rem 0 0; opacity: 0.9;">Create your account and start sharing</p>
+        </div>
+        
+        <div class="card-body">
+            <form method="POST" novalidate>
+                <div class="form-group">
+                    <label for="full_name" class="form-label">
+                        👤 Full Name
+                    </label>
+                    <input 
+                        type="text" 
+                        id="full_name" 
+                        name="full_name" 
+                        class="form-control" 
+                        required 
+                        autocomplete="name"
+                        placeholder="Enter your full name"
+                        data-tooltip="Your display name on the blog"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        🏷️ Username
+                    </label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="form-control" 
+                        required 
+                        autocomplete="username"
+                        placeholder="Choose a unique username"
+                        data-tooltip="3-20 characters, letters, numbers, and underscores only"
+                        pattern="[a-zA-Z0-9_]{3,20}"
+                    >
+                    <div class="username-availability" style="margin-top: 0.25rem; font-size: 0.875rem;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        📧 Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-control" 
+                        required 
+                        autocomplete="email"
+                        placeholder="Enter your email address"
+                        data-tooltip="We'll never share your email with anyone"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        🔒 Password
+                    </label>
+                    <div style="position: relative;">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-control" 
+                            required 
+                            autocomplete="new-password" 
+                            placeholder="Create a strong password"
+                            data-tooltip="At least 6 characters long"
+                            minlength="6"
+                        >
+                        <button 
+                            type="button" 
+                            class="password-toggle" 
+                            style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-secondary);"
+                            data-tooltip="Show/hide password"
+                        >
+                            👁️
+                        </button>
+                    </div>
+                    <div class="password-strength" style="margin-top: 0.5rem;">
+                        <div class="password-strength-bar" style="height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
+                            <div class="password-strength-fill" style="height: 100%; width: 0%; background: var(--error-color); transition: all 0.3s ease;"></div>
+                        </div>
+                        <div class="password-strength-text" style="font-size: 0.75rem; margin-top: 0.25rem; color: var(--text-secondary);"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label">
+                        🔒 Confirm Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="confirm_password" 
+                        name="confirm_password" 
+                        class="form-control" 
+                        required 
+                        autocomplete="new-password" 
+                        placeholder="Confirm your password"
+                        data-tooltip="Must match the password above"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="terms" required style="margin: 0;">
+                        <span style="font-size: 0.875rem;">
+                            I agree to the <a href="#" style="color: var(--primary-color);">Terms of Service</a> 
+                            and <a href="#" style="color: var(--primary-color);">Privacy Policy</a>
+                        </span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        🎉 Create Account
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="card-footer text-center">
+            <p style="margin: 0;">
+                Already have an account? 
+                <a href="{{ url_for('login') }}" style="font-weight: 600;">
+                    Sign in here
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Registration Benefits -->
+    <div class="card" style="margin-top: 2rem; background: linear-gradient(135deg, #f0f9ff, #e0f2fe);">
+        <div class="card-body">
+            <h4 style="text-align: center; margin-bottom: 1.5rem; color: var(--primary-color);">
+                🌟 Why Join Our Community?
+            </h4>
+            <div style="display: grid; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">✍️</span>
+                    <div>
+                        <strong>Share Your Stories</strong>
+                        <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                            Write and publish your thoughts to reach a wider audience
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">💬</span>
+                    <div>
+                        <strong>Engage with Others</strong>
+                        <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                            Comment, discuss, and connect with like-minded individuals
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">📊</span>
+                    <div>
+                        <strong>Track Your Progress</strong>
+                        <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                            See your writing stats and engagement metrics
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">🎨</span>
+                    <div>
+                        <strong>Customize Your Profile</strong>
+                        <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+                            Create a personalized profile that represents you
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const passwordToggle = document.querySelector('.password-toggle');
+    const usernameInput = document.getElementById('username');
+    
+    // Password toggle functionality
+    if (passwordToggle && passwordInput) {
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            this.textContent = type === 'password' ? '👁️' : '🙈';
+        });
+    }
+    
+    // Password strength indicator
+    if (passwordInput) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.querySelector('.password-strength-fill');
+            const strengthText = document.querySelector('.password-strength-text');
+            
+            let strength = 0;
+            let strengthLabel = '';
+            let color = 'var(--error-color)';
+            
+            if (password.length >= 6) strength += 20;
+            if (password.length >= 8) strength += 20;
+            if (/[a-z]/.test(password)) strength += 20;
+            if (/[A-Z]/.test(password)) strength += 20;
+            if (/[0-9]/.test(password)) strength += 10;
+            if (/[^a-zA-Z0-9]/.test(password)) strength += 10;
+            
+            if (strength < 40) {
+                strengthLabel = 'Weak';
+                color = 'var(--error-color)';
+            } else if (strength < 70) {
+                strengthLabel = 'Fair';
+                color = 'var(--warning-color)';
+            } else if (strength < 90) {
+                strengthLabel = 'Good';
+                color = '#3b82f6';
+            } else {
+                strengthLabel = 'Strong';
+                color = 'var(--success-color)';
+            }
+            
+            strengthBar.style.width = strength + '%';
+            strengthBar.style.background = color;
+            strengthText.textContent = password ? strengthLabel : '';
+            strengthText.style.color = color;
+        });
+    }
+    
+    // Password confirmation validation
+    if (confirmPasswordInput) {
+        confirmPasswordInput.addEventListener('input', function() {
+            const password = passwordInput.value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.classList.add('is-invalid');
+                showFieldError(this, 'Passwords do not match');
+            } else {
+                this.classList.remove('is-invalid');
+                removeFieldError(this);
+            }
+        });
+    }
+    
+    // Username availability check (mock implementation)
+    if (usernameInput) {
+        let checkTimeout;
+        usernameInput.addEventListener('input', function() {
+            const username = this.value.trim();
+            const availabilityDiv = document.querySelector('.username-availability');
+            
+            clearTimeout(checkTimeout);
+            
+            if (username.length >= 3) {
+                availabilityDiv.innerHTML = '<span style="color: var(--warning-color);">Checking availability...</span>';
+                
+                checkTimeout = setTimeout(() => {
+                    // Mock check - in real app, this would be an AJAX call
+                    const isAvailable = !['admin', 'test', 'user', 'demo'].includes(username.toLowerCase());
+                    
+                    if (isAvailable) {
+                        availabilityDiv.innerHTML = '<span style="color: var(--success-color);">✓ Username available</span>';
+                        this.classList.remove('is-invalid');
+                    } else {
+                        availabilityDiv.innerHTML = '<span style="color: var(--error-color);">✗ Username not available</span>';
+                        this.classList.add('is-invalid');
+                    }
+                }, 500);
+            } else {
+                availabilityDiv.innerHTML = '';
+            }
+        });
+    }
+    
+    // Form submission validation
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            const terms = document.getElementById('terms');
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                showAlert('Passwords do not match!', 'error');
+                return;
+            }
+            
+            if (!terms.checked) {
+                e.preventDefault();
+                showAlert('Please accept the terms and conditions!', 'error');
+                return;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

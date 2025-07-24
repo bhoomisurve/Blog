@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<!-- Post Content -->
+<article class="post-article">
+    <header class="post-header">
+        <h1 class="post-title">{{ post.title }}</h1>
+        
+        <div class="post-meta">
+            <div class="author-info">
+                <div class="author-avatar">
+                    {{ post.author.full_name[0].upper() }}
+                </div>
+                <div class="author-details">
+                    <a href="{{ url_for('profile', username=post.author.username) }}" class="author-name">
+                        {{ post.author.full_name }}
+                    </a>
+                    <div class="post-stats">
+                        <span>📅 {{ post.created_at.strftime('%B %d, %Y') }}</span>
+                        {% if post.updated_at > post.created_at %}
+                            <span>✏️ Updated {{ post.updated_at.strftime('%B %d, %Y') }}</span>
+                        {% endif %}
+                        <span>💬 {{ comments|length }} comments</span>
+                    </div>
+                </div>
+            </div>
+            
+            {% if session.user_id == post.user_id %}
+                <div class="post-actions">
+                    <a href="{{ url_for('edit_post', slug=post.slug) }}" class="btn btn-outline btn-sm">
+                        ✏️ Edit
+                    </a>
+                    <form method="POST" action="{{ url_for('delete_post', slug=post.slug) }}" 
+                          style="display: inline;"
+                          onsubmit="return confirm('Are you sure you want to delete this post?')">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            🗑️ Delete
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </header>
+    
+    <div class="post-content">
+        {{ post.content|safe }}
+    </div>
+</article>
+
+<!-- Comments Section -->
+<section class="comments-section">
+    <div class="comments-header">
+        <h3>💬 Comments ({{ comments|length }})</h3>
+        {% if session.user_id %}
+            <button class="btn btn-primary btn-sm" onclick="toggleCommentForm()">
+                ✍️ Add Comment
+            </button>
+        {% endif %}
+    </div>
+    
+    <!-- Add Comment Form -->
+    {% if session.user_id %}
+        <div id="comment-form" class="comment-form" style="display: none;">
+            <form method="POST" action="{{ url_for('add_comment', slug=post.slug) }}">
+                <div class="form-group">
+                    <label for="content">Your Comment</label>
+                    <textarea id="content" name="content" rows="4" required
+                              placeholder="Share your thoughts on this post..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">
+                        💬 Post Comment
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="toggleCommentForm()">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <div class="login-prompt card">
+            <p>💡 <a href="{{ url_for('login') }}">Login</a> or <a href="{{ url_for('register') }}">register</a> to join the conversation!</p>
+        </div>
+    {% endif %}
+    
+    <!-- Comments List -->
+    <div class="comments-list">
+        {% if comments %}
+            {% for comment in comments %}
+                <div class="comment">
+                    <div class="comment-author">
+                        <div class="comment-avatar">
+                            {{ comment.author.full_name[0].upper() }}
+                        </div>
+                        <div class="comment-info">
+                            <a href="{{ url_for('profile', username=comment.author.username) }}" class="comment-author-name">
+                                {{ comment.author.full_name }}
+                            </a>
+                            <div class="comment-date">
+                                {{ comment.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                            </div>
+                        </div>
+                        {% if session.user_id == comment.user_id %}
+                            <form method="POST" action="{{ url_for('delete_comment', comment_id=comment.id) }}" 
+                                  style="margin-left: auto;"
+                                  onsubmit="return confirm('Are you sure you want to delete this comment?')">
+                                <button type="submit" class="btn btn-danger btn-xs">
+                                    🗑️
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div class="comment-content">
+                        {{ comment.content|nl2br|safe }}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-comments">
+                <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                    <div style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;">💭</div>
+                    <h4>No comments yet</h4>
+                    <p>Be the first to share your thoughts on this post!</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Related Posts / Navigation -->
+<nav class="post-navigation">
+    <a href="{{ url_for('index') }}" class="btn btn-outline">
+        ← Back to All Posts
+    </a>
+    <a href="{{ url_for('profile', username=post.author.username) }}" class="btn btn-outline">
+        More by {{ post.author.full_name }} →
+    </a>
+</nav>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.post-article {
+    max-width: 800px;
+    margin: 0 auto 4rem;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.post-header {
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+}
+
+.post-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.post-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.author-avatar {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.author-name {
+    color: white;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-decoration: none;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.author-name:hover {
+    text-decoration: underline;
+}
+
+.post-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    flex-wrap: wrap;
+}
+
+.post-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.post-content {
+    padding: 2rem;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+}
+
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4,
+.post-content h5,
+.post-content h6 {
+    margin: 2rem 0 1rem;
+    color: var(--primary-color);
+}
+
+.post-content h2 {
+    font-size: 1.8rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.post-content h3 {
+    font-size: 1.5rem;
+}
+
+.post-content p {
+    margin-bottom: 1.5rem;
+}
+
+.post-content ul,
+.post-content ol {
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+}
+
+.post-content li {
+    margin-bottom: 0.5rem;
+}
+
+.post-content a {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.post-content blockquote {
+    border-left: 4px solid var(--primary-color);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+.comments-section {
+    max-width: 800px;
+    margin: 0 auto 4rem;
+}
+
+.comments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.comments-header h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.comment-form {
+    background: var(--card-background);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    margin-bottom: 2rem;
+    border: 1px solid var(--border-color);
+}
+
+.comment-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.comment-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.login-prompt {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--background-secondary);
+    margin-bottom: 2rem;
+}
+
+.login-prompt a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.login-prompt a:hover {
+    text-decoration: underline;
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.comment {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.comment-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.comment-info {
+    flex-grow: 1;
+}
+
+.comment-author-name {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.comment-author-name:hover {
+    text-decoration: underline;
+}
+
+.comment-date {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.comment-content {
+    line-height: 1.6;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+}
+
+.post-navigation {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-xs {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .post-title {
+        font-size: 2rem;
+    }
+    
+    .post-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .post-content {
+        padding: 1.5rem;
+        font-size: 1rem;
+    }
+    
+    .comments-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .post-navigation {
+        flex-direction: column;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function toggleCommentForm() {
+    const form = document.getElementById('comment-form');
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        form.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('content').focus();
+    } else {
+        form.style.display = 'none';
+    }
+}
+
+// Auto-expand textarea
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('content');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+    }
+});
+</script>
+{% endblock %}
